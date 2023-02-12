@@ -1,15 +1,18 @@
 import { useState } from "react";
 
-function Square({ value, onSquareClick }) {
+function Square({ value, onSquareClick, isWinnerSquare }) {
     return (
-        <button className="square" onClick={onSquareClick}>
+        <button
+            className={isWinnerSquare ? "square winner-square" : "square"}
+            onClick={onSquareClick}
+        >
             {value}
         </button>
     );
 }
 
 function Board({ xIsNext, squares, onPlay }) {
-    const winner = calculateWinner(squares);
+    const [winner, winnerSquares] = calculateWinner(squares);
     let status;
     if (winner) {
         status = "Winner: " + winner;
@@ -20,7 +23,8 @@ function Board({ xIsNext, squares, onPlay }) {
     }
 
     function handleClick(i) {
-        if (squares[i] || calculateWinner(squares)) {
+        const [hasWinner] = calculateWinner(squares);
+        if (squares[i] || hasWinner) {
             return;
         }
         const nextSquares = squares.slice();
@@ -41,13 +45,20 @@ function Board({ xIsNext, squares, onPlay }) {
                     <div className="board-row" key={i}>
                         {Array(3)
                             .fill("")
-                            .map((_, j) => (
-                                <Square
-                                    key={j}
-                                    value={squares[i * 3 + j]}
-                                    onSquareClick={() => handleClick(i * 3 + j)}
-                                />
-                            ))}
+                            .map((_, j) => {
+                                const loc = i * 3 + j;
+                                console.log(winnerSquares);
+                                return (
+                                    <Square
+                                        key={j}
+                                        value={squares[loc]}
+                                        onSquareClick={() => handleClick(loc)}
+                                        isWinnerSquare={winnerSquares?.hasOwnProperty(
+                                            loc
+                                        )}
+                                    />
+                                );
+                            })}
                     </div>
                 ))}
         </>
@@ -131,8 +142,8 @@ function calculateWinner(squares) {
             squares[a] === squares[b] &&
             squares[a] === squares[c]
         ) {
-            return squares[a];
+            return [squares[a], { [a]: true, [b]: true, [c]: true }];
         }
     }
-    return null;
+    return [null];
 }
