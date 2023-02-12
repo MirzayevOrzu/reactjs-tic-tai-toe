@@ -55,6 +55,7 @@ function Board({ xIsNext, squares, onPlay }) {
 export default function Game() {
     const [history, setHistory] = useState([Array(9).fill(null)]);
     const [currentMove, setCurrentMove] = useState(0);
+    const [sort, setSort] = useState(false);
     const currentSquares = history[currentMove];
     const xIsNext = currentMove % 2 === 0;
 
@@ -87,6 +88,10 @@ export default function Game() {
         );
     });
 
+    if (sort) {
+        moves.reverse();
+    }
+
     return (
         <div className="game">
             <div className="game-board">
@@ -97,6 +102,9 @@ export default function Game() {
                 />
             </div>
             <div className="game-info">
+                <button onClick={() => setSort(!sort)}>
+                    {sort ? "Sort desc" : "Sort asc"}
+                </button>
                 <ol>{moves}</ol>
             </div>
         </div>
