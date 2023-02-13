@@ -47,7 +47,6 @@ function Board({ xIsNext, squares, onPlay }) {
                             .fill("")
                             .map((_, j) => {
                                 const loc = i * 3 + j;
-                                console.log(winnerSquares);
                                 return (
                                     <Square
                                         key={j}
@@ -83,17 +82,24 @@ export default function Game() {
     }
 
     const moves = history.map((squares, move) => {
+        const [col, row] = identifyMoveCoordinates(history[move - 1], squares);
         let description;
         if (move > 0) {
             description = "Go to move #" + move;
+        } else if (move === currentMove) {
+            description = "You are at move #" + move;
         } else {
             description = "Go to game start";
+        }
+
+        if (col) {
+            description += ` (${col}, ${row})`;
         }
 
         return (
             <li key={move}>
                 {move === currentMove ? (
-                    "You are at move #" + move
+                    description
                 ) : (
                     <button onClick={() => jumpTo(move)}>{description}</button>
                 )}
@@ -146,4 +152,22 @@ function calculateWinner(squares) {
         }
     }
     return [null];
+}
+
+function identifyMoveCoordinates(prevSquares, currSquares) {
+    let col;
+    let row;
+
+    if (!prevSquares) {
+        return [col, row];
+    }
+
+    for (let i = 0; i < prevSquares.length; i++) {
+        if (prevSquares[i] !== currSquares[i]) {
+            col = Math.floor(i / 3);
+            row = i % 3;
+        }
+    }
+
+    return [col.toString(), row.toString()];
 }
